@@ -11,8 +11,8 @@ async function testLogin(login, password) {
     }
   } catch (err) {
     document.getElementById('app').innerHTML = `<h1>Сетевая ошибка</h1>`;
+    console.error(err);
   }
 }
 
-// Замени testBackend() на тест входа
 testLogin('admin', 'password');
