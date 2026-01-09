@@ -86,6 +86,8 @@ function showContractForm(marking) {
 
 function createContract(e) {
   e.preventDefault();
+
+  showLoading('Создание договора...');
   
   // Получаем имя сотрудника (временно — можно хранить после входа)
   const createdBy = 'Админ'; // позже заменим на реального пользователя
@@ -116,6 +118,8 @@ function createContract(e) {
 
 function returnEquipment(marking) {
   if (!confirm(`Вы уверены, что хотите вернуть комплект ${marking}?`)) return;
+  
+  showLoading('Выполняется возврат оборудования...');
 
   const url = `${BACKEND_URL}?action=returnEquipment&marking=${encodeURIComponent(marking)}`;
   
@@ -140,11 +144,24 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
   const loginValue = document.getElementById('login').value;
   const passwordValue = document.getElementById('password').value;
   
+  showLoading('Выполняется вход...');
+  
   try {
-    await login(loginValue, passwordValue); // <-- теперь функция не перезаписана
+    await login(loginValue, passwordValue);
     showEquipment();
   } catch (err) {
     alert('Ошибка: ' + err.message);
+    // Вернём форму входа
+    document.getElementById('app').innerHTML = `
+      <h1>Вход в систему аренды оборудования</h1>
+      <form id="loginForm">
+        <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
+        <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
+        <button type="submit">Войти</button>
+      </form>
+    `;
+    // Повторно добавим обработчик
+    document.getElementById('loginForm').addEventListener('submit', arguments.callee);
   }
 });
 
