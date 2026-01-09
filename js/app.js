@@ -49,17 +49,26 @@ function showContractForm(marking) {
 function createContract(e) {
   e.preventDefault();
   
-  const contractData = {
-    equipment: currentEquipment,
-    fullName: document.getElementById('fullName').value,
-    passport: document.getElementById('passport').value,
-    issueDate: document.getElementById('issueDate').value,
-    duration: document.getElementById('duration').value
-  };
+  const url = `${BACKEND_URL}?action=saveContract` +
+    `&equipment=${encodeURIComponent(currentEquipment)}` +
+    `&fullName=${encodeURIComponent(document.getElementById('fullName').value)}` +
+    `&passport=${encodeURIComponent(document.getElementById('passport').value)}` +
+    `&issueDate=${encodeURIComponent(document.getElementById('issueDate').value)}` +
+    `&duration=${encodeURIComponent(document.getElementById('duration').value)}`;
 
-  // Пока просто покажем данные
-  alert('Договор будет создан:\n' + JSON.stringify(contractData, null, 2));
-  showEquipment();
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert(`Договор ${data.contractNumber} успешно создан!`);
+        showEquipment();
+      } else {
+        alert('Ошибка при создании договора');
+      }
+    })
+    .catch(() => {
+      alert('Сетевая ошибка');
+    });
 }
 
 // Запуск
