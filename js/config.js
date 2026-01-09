@@ -1,7 +1,8 @@
 // ⚠️ НИКОГДА не коммить настоящий URL в публичный репозиторий!
 // Этот файл нужно заменять локально при развёртывании.
 
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycby9IkW11uYWUiVL_ohI7L4ZjIcF_-iSIkK6eCjH1pE5v1_1CvDvD9ikKxRKtRHmIIrn/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycby7H42iMW93lEG4MpGo-w7wr5Qw5j9p8cejl5rumpUXpbdcPHJ95RhUAtcH0ez8BVWt/exec";
+
 
 
 
