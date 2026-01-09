@@ -93,13 +93,13 @@ function createContract(e) {
   
   showLoading();
 
-  const createdBy = getCurrentUser()?.name || 'Неизвестно';
-
-  const fullName = document.getElementById('fullName')?.value || '';
-  const phone = document.getElementById('phone')?.value || '';
-  const duration = document.getElementById('duration')?.value || '7';
-  const amount = document.getElementById('amount')?.value || '0';
-  const paymentType = document.getElementById('paymentType')?.value || 'Наличные';
+  // ПОЛУЧАЕМ ДАННЫЕ ИЗ ФОРМЫ
+  const fullName = document.getElementById('fullName').value;
+  const phone = document.getElementById('phone').value;
+  const duration = document.getElementById('duration').value;
+  const amount = document.getElementById('amount').value;
+  const paymentType = document.getElementById('paymentType').value;
+  const createdBy = getCurrentUser()?.name || 'Неизвестно'; // ← ВАЖНО!
 
   const url = `${BACKEND_URL}?action=saveContract` +
     `&equipment=${encodeURIComponent(currentEquipment)}` +
