@@ -86,11 +86,10 @@ function showContractForm(marking) {
 
 function createContract(e) {
   e.preventDefault();
-
-  showLoading('Создание договора...');
   
-  // Получаем имя сотрудника (временно — можно хранить после входа)
-  const createdBy = 'Админ'; // позже заменим на реального пользователя
+  showLoading(); // ← "Загрузка... Это займет несколько секунд"
+
+  const createdBy = getCurrentUser()?.name || 'Неизвестно';
 
   const url = `${BACKEND_URL}?action=saveContract` +
     `&equipment=${encodeURIComponent(currentEquipment)}` +
@@ -105,16 +104,13 @@ function createContract(e) {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        // Показываем сообщение об успехе
+        // Показываем успех
         document.getElementById('app').innerHTML = `
           <h2>✅ Договор успешно создан!</h2>
           <p><strong>Номер:</strong> ${data.contractNumber}</p>
-          <p>Перенаправление через 3 секунды...</p>
+          <p>Загрузка... Это займет несколько секунд</p>
         `;
-        // Через 3 секунды — показываем таблицу
-        setTimeout(() => {
-          showEquipment();
-        }, 3000);
+        setTimeout(() => showEquipment(), 2500);
       } else {
         alert('Ошибка при создании договора');
         showEquipment();
@@ -122,13 +118,14 @@ function createContract(e) {
     })
     .catch(() => {
       alert('Сетевая ошибка');
+      showEquipment();
     });
 }
 
 function returnEquipment(marking) {
   if (!confirm(`Вы уверены, что хотите вернуть комплект ${marking}?`)) return;
-  
-  showLoading('Выполняется возврат оборудования...');
+
+  showLoading(); // ← "Загрузка... Это займет несколько секунд"
 
   const url = `${BACKEND_URL}?action=returnEquipment&marking=${encodeURIComponent(marking)}`;
   
@@ -138,11 +135,9 @@ function returnEquipment(marking) {
       if (data.success) {
         document.getElementById('app').innerHTML = `
           <h2>✅ Оборудование успешно возвращено!</h2>
-          <p>Перенаправление через 2 секунды...</p>
+          <p>Загрузка... Это займет несколько секунд</p>
         `;
-        setTimeout(() => {
-          showEquipment();
-        }, 2000);
+        setTimeout(() => showEquipment(), 2000);
       } else {
         alert('Ошибка при возврате');
         showEquipment();
@@ -150,23 +145,23 @@ function returnEquipment(marking) {
     })
     .catch(() => {
       alert('Сетевая ошибка');
+      showEquipment();
     });
 }
 
-// Обработка формы входа
+// Обработка входа
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const loginValue = document.getElementById('login').value;
   const passwordValue = document.getElementById('password').value;
   
-  showLoading('Выполняется вход...');
-  
+  showLoading(); // ← единый стиль
+
   try {
     await login(loginValue, passwordValue);
     showEquipment();
   } catch (err) {
     alert('Ошибка: ' + err.message);
-    // Вернём форму входа
     document.getElementById('app').innerHTML = `
       <h1>Вход в систему аренды оборудования</h1>
       <form id="loginForm">
@@ -175,47 +170,6 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         <button type="submit">Войти</button>
       </form>
     `;
-    // Повторно добавим обработчик
     document.getElementById('loginForm').addEventListener('submit', arguments.callee);
   }
 });
-
-// Защита функций от неавторизованного доступа
-const originalShowEquipment = showEquipment;
-showEquipment = function() {
-  if (!getCurrentUser()) {
-    document.getElementById('app').innerHTML = '<h1>Требуется вход</h1>';
-    return;
-  }
-  originalShowEquipment();
-};
-
-// Передаём имя сотрудника в договор
-const originalCreateContract = createContract;
-createContract = function(e) {
-  e.preventDefault();
-  const createdBy = getCurrentUser()?.name || 'Неизвестно';
-  // ... остальной код как у тебя, но с `createdBy`
-  const url = `${BACKEND_URL}?action=saveContract` +
-    `&equipment=${encodeURIComponent(currentEquipment)}` +
-    `&fullName=${encodeURIComponent(document.getElementById('fullName').value)}` +
-    `&phone=${encodeURIComponent(document.getElementById('phone').value)}` +
-    `&duration=${encodeURIComponent(document.getElementById('duration').value)}` +
-    `&amount=${encodeURIComponent(document.getElementById('amount').value)}` +
-    `&paymentType=${encodeURIComponent(document.getElementById('paymentType').value)}` +
-    `&createdBy=${encodeURIComponent(createdBy)}`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        alert(`Договор ${data.contractNumber} успешно создан!`);
-        showEquipment();
-      } else {
-        alert('Ошибка при создании договора');
-      }
-    })
-    .catch(() => {
-      alert('Сетевая ошибка');
-    });
-};
