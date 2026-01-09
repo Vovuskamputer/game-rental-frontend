@@ -105,10 +105,19 @@ function createContract(e) {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        alert(`Договор ${data.contractNumber} успешно создан!`);
-        showEquipment();
+        // Показываем сообщение об успехе
+        document.getElementById('app').innerHTML = `
+          <h2>✅ Договор успешно создан!</h2>
+          <p><strong>Номер:</strong> ${data.contractNumber}</p>
+          <p>Перенаправление через 3 секунды...</p>
+        `;
+        // Через 3 секунды — показываем таблицу
+        setTimeout(() => {
+          showEquipment();
+        }, 3000);
       } else {
         alert('Ошибка при создании договора');
+        showEquipment();
       }
     })
     .catch(() => {
@@ -127,10 +136,16 @@ function returnEquipment(marking) {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        alert('Оборудование успешно возвращено!');
-        showEquipment();
+        document.getElementById('app').innerHTML = `
+          <h2>✅ Оборудование успешно возвращено!</h2>
+          <p>Перенаправление через 2 секунды...</p>
+        `;
+        setTimeout(() => {
+          showEquipment();
+        }, 2000);
       } else {
         alert('Ошибка при возврате');
+        showEquipment();
       }
     })
     .catch(() => {
