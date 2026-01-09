@@ -140,9 +140,12 @@ function createContract(e) {
     });
 }
 
+let isReturning = false;
+
 function returnEquipment(marking) {
   if (!confirm(`Вы уверены, что хотите вернуть комплект ${marking}?`)) return;
-  
+  if (isReturning) return; // ← защита
+  isReturning = true;
   showLoading('Выполняется возврат оборудования...');
 
   const url = `${BACKEND_URL}?action=returnEquipment&marking=${encodeURIComponent(marking)}`;
