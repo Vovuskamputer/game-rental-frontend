@@ -1,4 +1,4 @@
-/* Сброс и общие стили */
+/* Сброс и базовые настройки */
 * {
   margin: 0;
   padding: 0;
@@ -6,207 +6,182 @@
 }
 
 :root {
-  --primary: #2c3e50;
-  --secondary: #3498db;
-  --success: #27ae60;
-  --warning: #e67e22;
-  --danger: #e74c3c;
-  --light: #ecf0f1;
-  --dark: #34495e;
-  --border: #ddd;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --success: #10b981;
+  --danger: #ef4444;
+  --light-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --text-light: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --radius: 8px;
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background-color: #f8f9fa;
-  color: var(--primary);
-  line-height: 1.6;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--light-bg);
+  color: var(--text);
+  line-height: 1.5;
   padding: 16px;
   min-height: 100vh;
 }
 
 #app {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
-  transition: opacity 0.3s ease;
+  overflow: hidden;
 }
 
-h1, h2, h3 {
-  color: var(--primary);
-  margin-bottom: 20px;
-  font-weight: 600;
+/* Заголовки */
+h1, h2 {
+  font-weight: 700;
+  padding: 20px 24px;
+  background: #f1f5f9;
+  margin: 0;
+  border-bottom: 1px solid var(--border);
 }
 
 h1 {
+  font-size: 1.5rem;
   text-align: center;
-  font-size: 1.8rem;
 }
 
 h2 {
-  font-size: 1.5rem;
-  border-bottom: 2px solid var(--secondary);
-  padding-bottom: 8px;
-  margin: 24px 0 16px;
+  font-size: 1.375rem;
+  color: var(--text);
 }
 
 /* Формы */
 form {
-  display: grid;
-  gap: 16px;
-  max-width: 600px;
-  margin: 0 auto;
+  padding: 24px;
 }
 
 label {
-  font-weight: 600;
-  color: var(--dark);
-  margin-bottom: 6px;
   display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
 }
 
-input, select, button {
-  padding: 12px;
+input, select {
+  width: 100%;
+  padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.2s ease;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: white;
 }
 
 input:focus, select:focus {
   outline: none;
-  border-color: var(--secondary);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+input[type="submit"],
 button {
-  background-color: var(--secondary);
+  background: var(--primary);
   color: white;
-  cursor: pointer;
-  font-weight: 600;
   border: none;
-  display: inline-block;
-  text-align: center;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 8px;
 }
 
+input[type="submit"]:hover,
 button:hover {
-  background-color: #2980b9;
-  transform: translateY(-1px);
+  background: var(--primary-dark);
 }
 
-button:active {
-  transform: translateY(0);
+button[type="button"] {
+  background: #64748b;
 }
 
-/* Кнопки действий */
-.btn-create {
-  background-color: var(--success);
-}
-.btn-create:hover {
-  background-color: #219653;
+button[type="button"]:hover {
+  background: #475569;
 }
 
-.btn-return {
-  background-color: var(--warning);
-  color: white;
-}
-.btn-return:hover {
-  background-color: #d35400;
-}
-
-/* Таблица оборудования */
+/* Таблица */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 15px;
+  margin: 0;
 }
 
 th, td {
-  padding: 14px;
+  padding: 12px 16px;
   text-align: left;
   border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
 }
 
 th {
-  background-color: var(--secondary);
-  color: white;
+  background: #f8fafc;
+  color: var(--text);
+  font-weight: 600;
   position: sticky;
   top: 0;
 }
 
-tr:nth-child(even) {
-  background-color: #f9fbfd;
+tr:last-child td {
+  border-bottom: none;
 }
 
-tr:hover {
-  background-color: #edf7ff;
+tr:hover td {
+  background-color: #f8fafc;
 }
 
-td[colspan] {
-  text-align: center;
-  color: #7f8c8d;
-}
-
-.status-rented {
-  color: var(--warning);
-  font-weight: 600;
-}
-
-.status-free {
+/* Состояния */
+.status-Свободен {
   color: var(--success);
   font-weight: 600;
 }
 
-/* Сообщения загрузки и успеха */
-.loading, .success-message {
-  text-align: center;
-  padding: 32px 0;
-}
-
-.success-message h2 {
-  color: var(--success);
-  margin-bottom: 12px;
-  font-size: 1.6rem;
-}
-
-.success-message p {
-  font-size: 1.1rem;
-  color: var(--dark);
+.status-В {
+  color: #f59e0b;
+  font-weight: 600;
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  #app {
+  body {
+    padding: 12px;
+  }
+
+  h1, h2, form {
     padding: 16px;
   }
-  
-  h1 {
-    font-size: 1.5rem;
-  }
-  
-  h2 {
-    font-size: 1.3rem;
-  }
-  
-  table {
-    font-size: 14px;
-  }
-  
+
   th, td {
-    padding: 10px 8px;
+    padding: 10px 12px;
+    font-size: 0.875rem;
   }
-  
-  form {
-    gap: 12px;
+
+  table {
+    display: block;
+    overflow-x: auto;
   }
-  
-  input, select, button {
-    padding: 10px;
-    font-size: 16px; /* чтобы не зумился на iOS */
-  }
+}
+
+/* Сообщения загрузки и успеха */
+#app > h2 {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 1.25rem;
+  color: var(--text-light);
+}
+
+#app > h2:has(strong) {
+  color: var(--text);
 }
