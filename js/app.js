@@ -84,10 +84,16 @@ function showContractForm(marking) {
   document.getElementById('contractForm').addEventListener('submit', createContract);
 }
 
+let isSubmitting = false; // ← флаг защиты
+
 function createContract(e) {
   e.preventDefault();
 
-  // ШАГ 1: Сразу читаем данные — форма ещё есть!
+  // 🔒 Защита от повторной отправки
+  if (isSubmitting) return;
+  isSubmitting = true;
+
+  // 📥 Сразу читаем данные — форма ещё есть!
   const fullName = document.getElementById('fullName').value;
   const phone = document.getElementById('phone').value;
   const duration = document.getElementById('duration').value;
@@ -95,7 +101,7 @@ function createContract(e) {
   const paymentType = document.getElementById('paymentType').value;
   const createdBy = 'Админ'; // или getCurrentUser()?.name
 
-  // ШАГ 2: Теперь можно показать загрузку — форма уже не нужна
+  // ⏳ Показываем загрузку
   showLoading('Создание договора...');
 
   const url = `${BACKEND_URL}?action=saveContract` +
@@ -111,15 +117,25 @@ function createContract(e) {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        alert(`Договор ${data.contractNumber} успешно создан!`);
-        showEquipment();
+        // ✅ Успех: показываем сообщение
+        document.getElementById('app').innerHTML = `
+          <h2>✅ Договор успешно создан!</h2>
+          <p><strong>Номер:</strong> ${data.contractNumber}</p>
+          <p>Возврат к таблице через 3 секунды...</p>
+        `;
+        setTimeout(() => {
+          isSubmitting = false; // сброс флага
+          showEquipment();
+        }, 3000);
       } else {
         alert('Ошибка при создании договора');
+        isSubmitting = false;
         showEquipment();
       }
     })
     .catch(() => {
       alert('Сетевая ошибка');
+      isSubmitting = false;
       showEquipment();
     });
 }
