@@ -15,4 +15,5 @@ async function testLogin(login, password) {
   }
 }
 
-testLogin('admin', 'password');
+//testLogin('admin', 'password');
+
