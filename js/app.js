@@ -1,18 +1,36 @@
 let currentEquipment = null;
 
 function showEquipment() {
+  if (!getCurrentUser()) {
+    document.getElementById('app').innerHTML = '<h1>Требуется вход</h1>';
+    return;
+  }
+
   const url = `${BACKEND_URL}?action=getEquipment`;
   fetch(url)
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        let html = '<h2>Оборудование:</h2><table border="1"><tr><th>Маркировка</th><th>Тип</th><th>Состояние</th><th>Действие</th></tr>';
+        let html = `
+          <h2>Оборудование:</h2>
+          <table border="1">
+            <tr>
+              <th>Маркировка</th>
+              <th>Тип</th>
+              <th>Состояние</th>
+              <th>Клиент</th>
+              <th>Телефон</th>
+              <th>Окончание аренды</th>
+              <th>Действие</th>
+            </tr>`;
+
         for (const item of data.equipment) {
           if (item.Состояние === 'Свободен') {
             html += `<tr>
               <td>${item.Маркировка}</td>
               <td>${item.Тип}</td>
               <td>${item.Состояние}</td>
+              <td colspan="3" style="text-align:center;">—</td>
               <td><button onclick="showContractForm('${item.Маркировка}')">Создать договор</button></td>
             </tr>`;
           } else if (item.Состояние === 'В аренде') {
@@ -20,6 +38,9 @@ function showEquipment() {
               <td>${item.Маркировка}</td>
               <td>${item.Тип}</td>
               <td>${item.Состояние}</td>
+              <td>${item.Клиент || '—'}</td>
+              <td>${item.Телефон || '—'}</td>
+              <td>${item.Окончание || '—'}</td>
               <td><button onclick="returnEquipment('${item.Маркировка}')">Вернуть</button></td>
             </tr>`;
           }
