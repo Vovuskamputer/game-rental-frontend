@@ -1,4 +1,6 @@
 let currentEquipment = null;
+let isSubmitting = false;
+let isReturning = false;
 
 function showLoading(message = 'Загрузка... Это займет несколько секунд') {
   document.getElementById('app').innerHTML = `<h2>${message}</h2>`;
@@ -81,27 +83,27 @@ function showContractForm(marking) {
     </form>
   `;
   document.getElementById('app').innerHTML = html;
-  document.getElementById('contractForm').addEventListener('submit', createContract);
+  
+  // Удаляем старый обработчик и добавляем новый
+  const form = document.getElementById('contractForm');
+  form.onsubmit = null;
+  form.addEventListener('submit', createContract);
 }
-
-let isSubmitting = false; // ← флаг защиты
 
 function createContract(e) {
   e.preventDefault();
 
-  // 🔒 Защита от повторной отправки
   if (isSubmitting) return;
   isSubmitting = true;
 
-  // 📥 Сразу читаем данные — форма ещё есть!
+  // Читаем данные ДО showLoading!
   const fullName = document.getElementById('fullName').value;
   const phone = document.getElementById('phone').value;
   const duration = document.getElementById('duration').value;
   const amount = document.getElementById('amount').value;
   const paymentType = document.getElementById('paymentType').value;
-  const createdBy = 'Админ'; // или getCurrentUser()?.name
+  const createdBy = getCurrentUser()?.name || 'Админ';
 
-  // ⏳ Показываем загрузку
   showLoading('Создание договора...');
 
   const url = `${BACKEND_URL}?action=saveContract` +
@@ -117,15 +119,14 @@ function createContract(e) {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        // ✅ Успех: показываем сообщение
         document.getElementById('app').innerHTML = `
           <h2>✅ Договор успешно создан!</h2>
           <p><strong>Номер:</strong> ${data.contractNumber}</p>
           <p>Возврат к таблице через 3 секунды...</p>
         `;
         setTimeout(() => {
-          isSubmitting = false; // сброс флага
-          showEquipment();
+          isSubmitting = false;
+          showEquipment(); // при возврате будет "Загрузка..."
         }, 3000);
       } else {
         alert('Ошибка при создании договора');
@@ -140,12 +141,11 @@ function createContract(e) {
     });
 }
 
-let isReturning = false;
-
 function returnEquipment(marking) {
   if (!confirm(`Вы уверены, что хотите вернуть комплект ${marking}?`)) return;
-  if (isReturning) return; // ← защита
+  if (isReturning) return;
   isReturning = true;
+
   showLoading('Выполняется возврат оборудования...');
 
   const url = `${BACKEND_URL}?action=returnEquipment&marking=${encodeURIComponent(marking)}`;
@@ -154,80 +154,55 @@ function returnEquipment(marking) {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        alert('Оборудование успешно возвращено!');
-        showEquipment();
+        document.getElementById('app').innerHTML = `
+          <h2>✅ Оборудование успешно возвращено!</h2>
+          <p>Возврат к таблице через 2 секунды...</p>
+        `;
+        setTimeout(() => {
+          isReturning = false;
+          showEquipment();
+        }, 2000);
       } else {
         alert('Ошибка при возврате');
+        isReturning = false;
+        showEquipment();
       }
     })
     .catch(() => {
       alert('Сетевая ошибка');
+      isReturning = false;
+      showEquipment();
     });
 }
 
-// Обработка формы входа
-document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+// Форма входа
+function showLoginForm() {
+  document.getElementById('app').innerHTML = `
+    <h1>Вход в систему аренды оборудования</h1>
+    <form id="loginForm">
+      <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
+      <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
+      <button type="submit">Войти</button>
+    </form>
+  `;
+  document.getElementById('loginForm').addEventListener('submit', handleLogin);
+}
+
+async function handleLogin(e) {
   e.preventDefault();
   const loginValue = document.getElementById('login').value;
   const passwordValue = document.getElementById('password').value;
   
   showLoading('Выполняется вход...');
-  
+
   try {
     await login(loginValue, passwordValue);
     showEquipment();
   } catch (err) {
     alert('Ошибка: ' + err.message);
-    // Вернём форму входа
-    document.getElementById('app').innerHTML = `
-      <h1>Вход в систему аренды оборудования</h1>
-      <form id="loginForm">
-        <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
-        <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
-        <button type="submit">Войти</button>
-      </form>
-    `;
-    // Повторно добавим обработчик
-    document.getElementById('loginForm').addEventListener('submit', arguments.callee);
+    showLoginForm();
   }
-});
+}
 
-// Защита функций от неавторизованного доступа
-const originalShowEquipment = showEquipment;
-showEquipment = function() {
-  if (!getCurrentUser()) {
-    document.getElementById('app').innerHTML = '<h1>Требуется вход</h1>';
-    return;
-  }
-  originalShowEquipment();
-};
-
-// Передаём имя сотрудника в договор
-const originalCreateContract = createContract;
-createContract = function(e) {
-  e.preventDefault();
-  const createdBy = getCurrentUser()?.name || 'Неизвестно';
-  // ... остальной код как у тебя, но с `createdBy`
-  const url = `${BACKEND_URL}?action=saveContract` +
-    `&equipment=${encodeURIComponent(currentEquipment)}` +
-    `&fullName=${encodeURIComponent(document.getElementById('fullName').value)}` +
-    `&phone=${encodeURIComponent(document.getElementById('phone').value)}` +
-    `&duration=${encodeURIComponent(document.getElementById('duration').value)}` +
-    `&amount=${encodeURIComponent(document.getElementById('amount').value)}` +
-    `&paymentType=${encodeURIComponent(document.getElementById('paymentType').value)}` +
-    `&createdBy=${encodeURIComponent(createdBy)}`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        alert(`Договор ${data.contractNumber} успешно создан!`);
-        showEquipment();
-      } else {
-        alert('Ошибка при создании договора');
-      }
-    })
-    .catch(() => {
-      alert('Сетевая ошибка');
-    });
-};
+// Запуск
+showLoginForm();
