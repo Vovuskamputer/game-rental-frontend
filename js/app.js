@@ -33,28 +33,38 @@ function showContractForm(marking) {
   const html = `
     <h2>Создание договора для ${marking}</h2>
     <form id="contractForm">
-      <label>ФИО арендатора:<br><input type="text" id="fullName" required></label><br><br>
-      <label>Паспорт (серия номер):<br><input type="text" id="passport" required></label><br><br>
-      <label>Дата выдачи (ГГГГ-ММ-ДД):<br><input type="date" id="issueDate" required></label><br><br>
+      <label>ФИО клиента:<br><input type="text" id="fullName" required></label><br><br>
+      <label>Телефон:<br><input type="tel" id="phone" required></label><br><br>
       <label>Срок аренды (дней):<br><input type="number" id="duration" min="1" value="7" required></label><br><br>
-      <button type="submit">Сохранить договор</button>
+      <label>Сумма оплаты (руб):<br><input type="number" id="amount" min="0" required></label><br><br>
+      <label>Тип оплаты:<br>
+        <select id="paymentType" required>
+          <option value="Наличные">Наличные</option>
+          <option value="Карта">Карта</option>
+        </select>
+      </label><br><br>
+      <button type="submit">Создать договор</button>
       <button type="button" onclick="showEquipment()">Назад</button>
     </form>
   `;
   document.getElementById('app').innerHTML = html;
-
   document.getElementById('contractForm').addEventListener('submit', createContract);
 }
 
 function createContract(e) {
   e.preventDefault();
   
+  // Получаем имя сотрудника (временно — можно хранить после входа)
+  const createdBy = 'Админ'; // позже заменим на реального пользователя
+
   const url = `${BACKEND_URL}?action=saveContract` +
     `&equipment=${encodeURIComponent(currentEquipment)}` +
     `&fullName=${encodeURIComponent(document.getElementById('fullName').value)}` +
-    `&passport=${encodeURIComponent(document.getElementById('passport').value)}` +
-    `&issueDate=${encodeURIComponent(document.getElementById('issueDate').value)}` +
-    `&duration=${encodeURIComponent(document.getElementById('duration').value)}`;
+    `&phone=${encodeURIComponent(document.getElementById('phone').value)}` +
+    `&duration=${encodeURIComponent(document.getElementById('duration').value)}` +
+    `&amount=${encodeURIComponent(document.getElementById('amount').value)}` +
+    `&paymentType=${encodeURIComponent(document.getElementById('paymentType').value)}` +
+    `&createdBy=${encodeURIComponent(createdBy)}`;
 
   fetch(url)
     .then(res => res.json())
