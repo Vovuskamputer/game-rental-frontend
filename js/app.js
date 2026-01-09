@@ -6,6 +6,11 @@ function showLoading(message = 'Загрузка... Это займет неск
   document.getElementById('app').innerHTML = `<h2>${message}</h2>`;
 }
 
+function goBackToEquipment() {
+  showLoading('Возврат к списку оборудования...');
+  setTimeout(showEquipment, 500); // небольшая задержка для плавности
+}
+
 function showEquipment() {
   if (!getCurrentUser()) {
     document.getElementById('app').innerHTML = '<h1>Требуется вход</h1>';
@@ -79,7 +84,7 @@ function showContractForm(marking) {
         </select>
       </label><br><br>
       <button type="submit">Создать договор</button>
-      <button type="button" onclick="showEquipment()">Назад</button>
+      <button type="button" onclick="goBackToEquipment()">Назад</button>
     </form>
   `;
   document.getElementById('app').innerHTML = html;
