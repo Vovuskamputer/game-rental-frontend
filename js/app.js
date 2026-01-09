@@ -87,18 +87,24 @@ function showContractForm(marking) {
 function createContract(e) {
   e.preventDefault();
 
+  // ШАГ 1: Сразу читаем данные — форма ещё есть!
+  const fullName = document.getElementById('fullName').value;
+  const phone = document.getElementById('phone').value;
+  const duration = document.getElementById('duration').value;
+  const amount = document.getElementById('amount').value;
+  const paymentType = document.getElementById('paymentType').value;
+  const createdBy = 'Админ'; // или getCurrentUser()?.name
+
+  // ШАГ 2: Теперь можно показать загрузку — форма уже не нужна
   showLoading('Создание договора...');
-  
-  // Получаем имя сотрудника (временно — можно хранить после входа)
-  const createdBy = 'Админ'; // позже заменим на реального пользователя
 
   const url = `${BACKEND_URL}?action=saveContract` +
     `&equipment=${encodeURIComponent(currentEquipment)}` +
-    `&fullName=${encodeURIComponent(document.getElementById('fullName').value)}` +
-    `&phone=${encodeURIComponent(document.getElementById('phone').value)}` +
-    `&duration=${encodeURIComponent(document.getElementById('duration').value)}` +
-    `&amount=${encodeURIComponent(document.getElementById('amount').value)}` +
-    `&paymentType=${encodeURIComponent(document.getElementById('paymentType').value)}` +
+    `&fullName=${encodeURIComponent(fullName)}` +
+    `&phone=${encodeURIComponent(phone)}` +
+    `&duration=${encodeURIComponent(duration)}` +
+    `&amount=${encodeURIComponent(amount)}` +
+    `&paymentType=${encodeURIComponent(paymentType)}` +
     `&createdBy=${encodeURIComponent(createdBy)}`;
 
   fetch(url)
@@ -109,10 +115,12 @@ function createContract(e) {
         showEquipment();
       } else {
         alert('Ошибка при создании договора');
+        showEquipment();
       }
     })
     .catch(() => {
       alert('Сетевая ошибка');
+      showEquipment();
     });
 }
 
