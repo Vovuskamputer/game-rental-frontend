@@ -109,5 +109,56 @@ function returnEquipment(marking) {
     });
 }
 
-// Запуск
-showEquipment();
+// Обработка формы входа
+document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const login = document.getElementById('login').value;
+  const password = document.getElementById('password').value;
+  
+  try {
+    await login(login, password);
+    showEquipment();
+  } catch (err) {
+    alert('Ошибка: ' + err.message);
+  }
+});
+
+// Защита функций от неавторизованного доступа
+const originalShowEquipment = showEquipment;
+showEquipment = function() {
+  if (!getCurrentUser()) {
+    document.getElementById('app').innerHTML = '<h1>Требуется вход</h1>';
+    return;
+  }
+  originalShowEquipment();
+};
+
+// Передаём имя сотрудника в договор
+const originalCreateContract = createContract;
+createContract = function(e) {
+  e.preventDefault();
+  const createdBy = getCurrentUser()?.name || 'Неизвестно';
+  // ... остальной код как у тебя, но с `createdBy`
+  const url = `${BACKEND_URL}?action=saveContract` +
+    `&equipment=${encodeURIComponent(currentEquipment)}` +
+    `&fullName=${encodeURIComponent(document.getElementById('fullName').value)}` +
+    `&phone=${encodeURIComponent(document.getElementById('phone').value)}` +
+    `&duration=${encodeURIComponent(document.getElementById('duration').value)}` +
+    `&amount=${encodeURIComponent(document.getElementById('amount').value)}` +
+    `&paymentType=${encodeURIComponent(document.getElementById('paymentType').value)}` +
+    `&createdBy=${encodeURIComponent(createdBy)}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert(`Договор ${data.contractNumber} успешно создан!`);
+        showEquipment();
+      } else {
+        alert('Ошибка при создании договора');
+      }
+    })
+    .catch(() => {
+      alert('Сетевая ошибка');
+    });
+};
