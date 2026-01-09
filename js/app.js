@@ -6,7 +6,7 @@ function showEquipment() {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        let html = '<h2>Доступные комплекты:</h2><table border="1"><tr><th>Маркировка</th><th>Тип</th><th>Состояние</th><th>Действие</th></tr>';
+        let html = '<h2>Оборудование:</h2><table border="1"><tr><th>Маркировка</th><th>Тип</th><th>Состояние</th><th>Действие</th></tr>';
         for (const item of data.equipment) {
           if (item.Состояние === 'Свободен') {
             html += `<tr>
@@ -14,6 +14,13 @@ function showEquipment() {
               <td>${item.Тип}</td>
               <td>${item.Состояние}</td>
               <td><button onclick="showContractForm('${item.Маркировка}')">Создать договор</button></td>
+            </tr>`;
+          } else if (item.Состояние === 'В аренде') {
+            html += `<tr>
+              <td>${item.Маркировка}</td>
+              <td>${item.Тип}</td>
+              <td>${item.Состояние}</td>
+              <td><button onclick="returnEquipment('${item.Маркировка}')">Вернуть</button></td>
             </tr>`;
           }
         }
@@ -41,6 +48,7 @@ function showContractForm(marking) {
         <select id="paymentType" required>
           <option value="Наличные">Наличные</option>
           <option value="Карта">Карта</option>
+          <option value="Перевод">Перевод</option>
         </select>
       </label><br><br>
       <button type="submit">Создать договор</button>
@@ -74,6 +82,26 @@ function createContract(e) {
         showEquipment();
       } else {
         alert('Ошибка при создании договора');
+      }
+    })
+    .catch(() => {
+      alert('Сетевая ошибка');
+    });
+}
+
+function returnEquipment(marking) {
+  if (!confirm(`Вы уверены, что хотите вернуть комплект ${marking}?`)) return;
+
+  const url = `${BACKEND_URL}?action=returnEquipment&marking=${encodeURIComponent(marking)}`;
+  
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert('Оборудование успешно возвращено!');
+        showEquipment();
+      } else {
+        alert('Ошибка при возврате');
       }
     })
     .catch(() => {
