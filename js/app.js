@@ -82,16 +82,16 @@ function showContractForm(marking) {
   `;
   document.getElementById('app').innerHTML = html;
   
-  // Удаляем старый обработчик, если был
+  // Удаляем старый обработчик (если был) и добавляем новый
   const form = document.getElementById('contractForm');
-  form.onsubmit = null; // сбрасываем
+  form.onsubmit = null;
   form.addEventListener('submit', createContract);
 }
 
 function createContract(e) {
   e.preventDefault();
   
-  // Защита от ошибки "null"
+  // Защита: если формы нет — выходим
   const fullNameEl = document.getElementById('fullName');
   if (!fullNameEl) return;
 
@@ -190,5 +190,5 @@ async function handleLogin(e) {
   }
 }
 
-// Запуск
+// Запуск приложения
 showLoginForm();
