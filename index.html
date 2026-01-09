@@ -3,15 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Аренда оборудования</title>
+  <title>Аренда оборудования — Вход</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div id="app">
-    <h1>Загрузка...</h1>
+    <h1>Вход в систему аренды оборудования</h1>
+    <form id="loginForm">
+      <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
+      <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
+      <button type="submit">Войти</button>
+    </form>
   </div>
   <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
