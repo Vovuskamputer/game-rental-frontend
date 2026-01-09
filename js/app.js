@@ -112,11 +112,11 @@ function returnEquipment(marking) {
 // Обработка формы входа
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const login = document.getElementById('login').value;
-  const password = document.getElementById('password').value;
+  const loginValue = document.getElementById('login').value;
+  const passwordValue = document.getElementById('password').value;
   
   try {
-    await login(login, password);
+    await login(loginValue, passwordValue); // <-- теперь функция не перезаписана
     showEquipment();
   } catch (err) {
     alert('Ошибка: ' + err.message);
