@@ -91,15 +91,18 @@ function showContractForm(marking) {
 function createContract(e) {
   e.preventDefault();
   
+  // Защита от ошибки "null"
+  const fullNameEl = document.getElementById('fullName');
+  if (!fullNameEl) return;
+
   showLoading();
 
-  // ПОЛУЧАЕМ ДАННЫЕ ИЗ ФОРМЫ
   const fullName = document.getElementById('fullName').value;
   const phone = document.getElementById('phone').value;
   const duration = document.getElementById('duration').value;
   const amount = document.getElementById('amount').value;
   const paymentType = document.getElementById('paymentType').value;
-  const createdBy = getCurrentUser()?.name || 'Неизвестно'; // ← ВАЖНО!
+  const createdBy = getCurrentUser()?.name || 'Неизвестно';
 
   const url = `${BACKEND_URL}?action=saveContract` +
     `&equipment=${encodeURIComponent(currentEquipment)}` +
