@@ -1,0 +1,75 @@
+/* Экран входа */
+.login-screen .card {
+  max-width: 400px;
+  margin: 60px auto;
+  text-align: center;
+}
+
+.login-screen h1 {
+  margin-bottom: var(--space-xl);
+  color: var(--color-primary);
+}
+
+/* Экран оборудования */
+.equipment-screen h2 {
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.equipment-screen .table {
+  margin-top: var(--space-md);
+}
+
+/* Экран создания договора */
+.contract-form h2 {
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.contract-form .form-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  margin-top: var(--space-lg);
+}
+
+/* Экран загрузки / успеха */
+.loading-screen,
+.success-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.loading-screen h2,
+.success-screen h2 {
+  margin-bottom: var(--space-md);
+  color: var(--color-primary);
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--space-sm);
+  }
+  
+  .card {
+    padding: var(--space-md);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .table {
+    font-size: 0.9rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: var(--space-sm);
+  }
+}
