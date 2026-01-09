@@ -1,228 +1,167 @@
-/* ─────────────────────────────────────── */
-/* СБРОС И БАЗА */
-/* ─────────────────────────────────────── */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+* {
   margin: 0;
   padding: 0;
-}
-
-:root {
-  --color-primary: #3498db;
-  --color-success: #27ae60;
-  --color-danger: #e74c3c;
-  --color-bg: #f8f9fa;
-  --color-card: #ffffff;
-  --color-text: #2c3e50;
-  --color-muted: #7f8c8d;
-  --color-border: #e0e0e0;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --radius-md: 8px;
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+  background-color: #f5f7fa;
+  color: #2d3748;
   line-height: 1.6;
-  padding: var(--space-md);
+  padding: 20px;
 }
 
-.container {
+#app {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.card {
-  background: var(--color-card);
-  padding: var(--space-lg);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  margin: 40px auto;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
 h1, h2 {
   text-align: center;
-  margin-bottom: var(--space-lg);
-  color: var(--color-primary);
-}
-
-/* ─────────────────────────────────────── */
-/* КНОПКИ */
-/* ─────────────────────────────────────── */
-
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
+  margin-bottom: 24px;
+  color: #2c3e50;
   font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  transition: all 0.2s ease;
 }
 
-.btn-primary {
-  background-color: var(--color-primary);
-  color: white;
-}
-.btn-primary:hover {
-  background-color: #2980b9;
-  transform: translateY(-1px);
+/* Форма входа */
+form {
+  max-width: 400px;
+  margin: 0 auto;
 }
 
-.btn-success {
-  background-color: var(--color-success);
-  color: white;
-}
-.btn-success:hover {
-  background-color: #219653;
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-}
-.btn-outline:hover {
-  background: rgba(52, 152, 219, 0.1);
-}
-
-/* ─────────────────────────────────────── */
-/* ФОРМЫ */
-/* ─────────────────────────────────────── */
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-label {
+label {
   display: block;
-  margin-bottom: 6px;
+  margin: 16px 0 8px;
   font-weight: 600;
+  color: #2c3e50;
 }
 
-.form-control {
+input[type="text"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+select {
   width: 100%;
   padding: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.form-control:focus {
+input:focus,
+select:focus {
   outline: none;
-  border-color: var(--color-primary);
+  border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-/* ─────────────────────────────────────── */
-/* ТАБЛИЦА */
-/* ─────────────────────────────────────── */
+button,
+input[type="submit"] {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 10px;
+}
+button:hover,
+input[type="submit"]:hover {
+  background-color: #2980b9;
+}
+button:active {
+  transform: translateY(1px);
+}
 
-.table {
+/* Кнопки "Создать договор" и "Вернуть" */
+button[onclick^="showContractForm"],
+button[onclick^="returnEquipment"] {
+  background-color: #27ae60;
+}
+button[onclick^="showContractForm"]:hover,
+button[onclick^="returnEquipment"]:hover {
+  background-color: #219653;
+}
+
+/* Таблица */
+table {
   width: 100%;
   border-collapse: collapse;
   margin: 24px 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-.table th,
-.table td {
+th, td {
   padding: 14px;
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
+  border: 1px solid #eaeaea;
 }
 
-.table th {
-  background-color: var(--color-primary);
+th {
+  background-color: #3498db;
   color: white;
   font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px;
 }
 
-.table tr:nth-child(even) {
+tr:nth-child(even) {
   background-color: #fafafa;
 }
 
-.table tr:hover {
+tr:hover {
   background-color: #f0f8ff;
 }
 
-/* ─────────────────────────────────────── */
-/* ЭКРАНЫ */
-/* ─────────────────────────────────────── */
+td[colspan] {
+  text-align: center !important;
+  color: #7f8c8d;
+}
 
-/* Вход */
-#login-screen .card {
-  max-width: 450px;
+/* Состояние: Свободен / В аренде */
+td:nth-child(3) {
+  font-weight: bold;
+}
+td:nth-child(3):contains('Свободен') {
+  color: #27ae60;
+}
+td:nth-child(3):contains('В аренде') {
+  color: #e74c3c;
+}
+
+/* Загрузка и успех */
+h2 + p {
   text-align: center;
+  font-size: 18px;
+  color: #7f8c8d;
+  margin-top: 12px;
 }
 
-/* Оборудование */
-#equipment-screen h2 {
-  margin-bottom: 24px;
-}
-
-/* Форма договора */
-#contract-form h2 {
-  margin-bottom: 24px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-/* Загрузка / Успех */
-.loading-screen,
-.success-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-}
-
-.loading-screen h2,
-.success-screen h2 {
-  color: var(--color-primary);
-  margin-bottom: 16px;
-}
-
-/* ─────────────────────────────────────── */
-/* АДАПТИВ */
-/* ─────────────────────────────────────── */
-
+/* Адаптив */
 @media (max-width: 768px) {
   body {
     padding: 12px;
   }
-  
-  .card {
-    padding: 20px;
-    margin: 20px auto;
+  #app {
+    padding: 16px;
+    border-radius: 8px;
   }
-  
-  .form-actions {
-    flex-direction: column;
+  table {
+    font-size: 14px;
   }
-  
-  .table {
-    font-size: 0.9rem;
-  }
-  
-  .table th,
-  .table td {
+  th, td {
     padding: 10px;
+  }
+  button {
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }
