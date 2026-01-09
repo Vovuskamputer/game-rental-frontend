@@ -1,5 +1,9 @@
 let currentEquipment = null;
 
+function showLoading(message = 'Загрузка... Это займет несколько секунд') {
+  document.getElementById('app').innerHTML = `<h2>${message}</h2>`;
+}
+
 function showEquipment() {
   if (!getCurrentUser()) {
     document.getElementById('app').innerHTML = '<h1>Требуется вход</h1>';
