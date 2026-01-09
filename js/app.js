@@ -81,30 +81,39 @@ function showContractForm(marking) {
     </form>
   `;
   document.getElementById('app').innerHTML = html;
-  document.getElementById('contractForm').addEventListener('submit', createContract);
+  
+  // Удаляем старый обработчик, если был
+  const form = document.getElementById('contractForm');
+  form.onsubmit = null; // сбрасываем
+  form.addEventListener('submit', createContract);
 }
 
 function createContract(e) {
   e.preventDefault();
   
-  showLoading(); // ← "Загрузка... Это займет несколько секунд"
+  showLoading();
 
   const createdBy = getCurrentUser()?.name || 'Неизвестно';
 
+  const fullName = document.getElementById('fullName')?.value || '';
+  const phone = document.getElementById('phone')?.value || '';
+  const duration = document.getElementById('duration')?.value || '7';
+  const amount = document.getElementById('amount')?.value || '0';
+  const paymentType = document.getElementById('paymentType')?.value || 'Наличные';
+
   const url = `${BACKEND_URL}?action=saveContract` +
     `&equipment=${encodeURIComponent(currentEquipment)}` +
-    `&fullName=${encodeURIComponent(document.getElementById('fullName').value)}` +
-    `&phone=${encodeURIComponent(document.getElementById('phone').value)}` +
-    `&duration=${encodeURIComponent(document.getElementById('duration').value)}` +
-    `&amount=${encodeURIComponent(document.getElementById('amount').value)}` +
-    `&paymentType=${encodeURIComponent(document.getElementById('paymentType').value)}` +
+    `&fullName=${encodeURIComponent(fullName)}` +
+    `&phone=${encodeURIComponent(phone)}` +
+    `&duration=${encodeURIComponent(duration)}` +
+    `&amount=${encodeURIComponent(amount)}` +
+    `&paymentType=${encodeURIComponent(paymentType)}` +
     `&createdBy=${encodeURIComponent(createdBy)}`;
 
   fetch(url)
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        // Показываем успех
         document.getElementById('app').innerHTML = `
           <h2>✅ Договор успешно создан!</h2>
           <p><strong>Номер:</strong> ${data.contractNumber}</p>
@@ -125,7 +134,7 @@ function createContract(e) {
 function returnEquipment(marking) {
   if (!confirm(`Вы уверены, что хотите вернуть комплект ${marking}?`)) return;
 
-  showLoading(); // ← "Загрузка... Это займет несколько секунд"
+  showLoading();
 
   const url = `${BACKEND_URL}?action=returnEquipment&marking=${encodeURIComponent(marking)}`;
   
@@ -149,27 +158,34 @@ function returnEquipment(marking) {
     });
 }
 
-// Обработка входа
-document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+// Форма входа
+function showLoginForm() {
+  document.getElementById('app').innerHTML = `
+    <h1>Вход в систему аренды оборудования</h1>
+    <form id="loginForm">
+      <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
+      <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
+      <button type="submit">Войти</button>
+    </form>
+  `;
+  document.getElementById('loginForm').addEventListener('submit', handleLogin);
+}
+
+async function handleLogin(e) {
   e.preventDefault();
   const loginValue = document.getElementById('login').value;
   const passwordValue = document.getElementById('password').value;
   
-  showLoading(); // ← единый стиль
+  showLoading();
 
   try {
     await login(loginValue, passwordValue);
     showEquipment();
   } catch (err) {
     alert('Ошибка: ' + err.message);
-    document.getElementById('app').innerHTML = `
-      <h1>Вход в систему аренды оборудования</h1>
-      <form id="loginForm">
-        <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
-        <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
-        <button type="submit">Войти</button>
-      </form>
-    `;
-    document.getElementById('loginForm').addEventListener('submit', arguments.callee);
+    showLoginForm();
   }
-});
+}
+
+// Запуск
+showLoginForm();
