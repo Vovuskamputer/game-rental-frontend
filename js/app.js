@@ -90,47 +90,36 @@ function showContractForm(marking) {
 
 function createContract(e) {
   e.preventDefault();
-  
-  // Защита: если формы нет — выходим
+
+  // Защита от ошибки "null"
   const fullNameEl = document.getElementById('fullName');
   if (!fullNameEl) return;
 
-  showLoading();
+  showLoading('Создание договора...');
 
-  const fullName = document.getElementById('fullName').value;
-  const phone = document.getElementById('phone').value;
-  const duration = document.getElementById('duration').value;
-  const amount = document.getElementById('amount').value;
-  const paymentType = document.getElementById('paymentType').value;
-  const createdBy = getCurrentUser()?.name || 'Неизвестно';
+  const createdBy = getCurrentUser()?.name || 'Админ'; // ← теперь реальное имя, но с fallback
 
   const url = `${BACKEND_URL}?action=saveContract` +
     `&equipment=${encodeURIComponent(currentEquipment)}` +
-    `&fullName=${encodeURIComponent(fullName)}` +
-    `&phone=${encodeURIComponent(phone)}` +
-    `&duration=${encodeURIComponent(duration)}` +
-    `&amount=${encodeURIComponent(amount)}` +
-    `&paymentType=${encodeURIComponent(paymentType)}` +
+    `&fullName=${encodeURIComponent(fullNameEl.value)}` +
+    `&phone=${encodeURIComponent(document.getElementById('phone').value)}` +
+    `&duration=${encodeURIComponent(document.getElementById('duration').value)}` +
+    `&amount=${encodeURIComponent(document.getElementById('amount').value)}` +
+    `&paymentType=${encodeURIComponent(document.getElementById('paymentType').value)}` +
     `&createdBy=${encodeURIComponent(createdBy)}`;
 
   fetch(url)
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        document.getElementById('app').innerHTML = `
-          <h2>✅ Договор успешно создан!</h2>
-          <p><strong>Номер:</strong> ${data.contractNumber}</p>
-          <p>Загрузка... Это займет несколько секунд</p>
-        `;
-        setTimeout(() => showEquipment(), 2500);
+        alert(`Договор ${data.contractNumber} успешно создан!`);
+        showEquipment();
       } else {
         alert('Ошибка при создании договора');
-        showEquipment();
       }
     })
     .catch(() => {
       alert('Сетевая ошибка');
-      showEquipment();
     });
 }
 
