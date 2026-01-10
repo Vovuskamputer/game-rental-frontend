@@ -1,6 +1,15 @@
 let currentEquipment = null;
 let isSubmitting = false;
 let isReturning = false;
+let currentUser = null;
+
+function getCurrentUser() {
+  return currentUser;
+}
+
+function setCurrentUser(user) {
+  currentUser = user;
+}
 
 function showLoading(message = 'Загрузка... Это займет несколько секунд') {
   document.getElementById('app').innerHTML = `<h2>${message}</h2>`;
@@ -240,8 +249,8 @@ async function handleLogin(e) {
       const vData = await vRes.json();
       
       if (vData.success) {
-        // Сохраняем сессию
-        window.currentUser = loginData.user;
+        // 🔑 СОХРАНЯЕМ СЕССИЮ ПРАВИЛЬНО
+        setCurrentUser(loginData.user);
         showEquipment();
       } else {
         alert('Ошибка: ' + vData.error);
