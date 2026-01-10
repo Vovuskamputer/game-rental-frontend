@@ -5,19 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Аренда оборудования</title>
   <link rel="stylesheet" href="css/style.css" />
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div id="app">
-    <h1>Вход в систему аренды оборудования</h1>
-    <form id="loginForm">
-      <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
-      <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
-      <button type="submit">Войти</button>
-    </form>
+    <!-- Сюда подставится кнопка Google -->
   </div>
   <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+    // ВСТАВЬ ЭТОТ КОД ПРЯМО ЗДЕСЬ (внутри script после config.js)
+    function handleCredentialResponse(response) {
+      const payload = JSON.parse(atob(response.credential.split('.')[1]));
+      sessionStorage.setItem('googleEmail', payload.email);
+      showLoginForm();
+    }
+
+    function showLoginForm() {
+      document.getElementById('app').innerHTML = `
+        <h1>Вход в систему аренды оборудования</h1>
+        <form id="loginForm">
+          <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
+          <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
+          <button type="submit">Войти</button>
+        </form>
+      `;
+      document.getElementById('loginForm').addEventListener('submit', handleLoginSubmit);
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const loginValue = document.getElementById('login').value;
+      const passwordValue = document.getElementById('password').value;
+      const email = sessionStorage.getItem('googleEmail');
+
+      if (!email) {
+        alert('Сначала войдите через Google');
+        return;
+      }
+
+      const loadingEl = document.createElement('h2');
+      loadingEl.textContent = 'Выполняется вход...';
+      document.getElementById('app').innerHTML = '';
+      document.getElementById('app').appendChild(loadingEl);
+
+      try {
+        const url = `${BACKEND_URL}?action=login&login=${encodeURIComponent(loginValue)}&password=${encodeURIComponent(passwordValue)}&email=${encodeURIComponent(email)}`;
+        const res = await fetch(url);
+        const result = await res.json();
+
+        if (result.success) {
+          // Сохраняем пользователя
+          sessionStorage.setItem('currentUser', JSON.stringify(result.user));
+          showEquipment();
+        } else {
+          alert('Ошибка: ' + result.error);
+          showLoginForm();
+        }
+      } catch (err) {
+        alert('Сетевая ошибка');
+        showLoginForm();
+      }
+    }
+
+    // Инициализация: показываем кнопку Google
+    window.onload = () => {
+      document.getElementById('app').innerHTML = `
+        <h1>Вход в систему аренды оборудования</h1>
+        <div id="g_id_onload"
+          data-client_id="425590971684-tlv3dk14b1ou5najmo6l5uacvfeksa9l.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse"
+          data-auto_select="false"
+          data-cancel_on_tap_outside="true">
+        </div>
+        <div class="g_id_signin" data-type="standard"></div>
+      `;
+    };
+
+    // Функция для показа оборудования (временно здесь)
+    function showEquipment() {
+      document.getElementById('app').innerHTML = '<h2>Загрузка...</h2>';
+      fetch(`${BACKEND_URL}?action=getEquipment`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            let html = `<h2>Оборудование:</h2><table border="1"><tr><th>Маркировка</th><th>Тип</th><th>Состояние</th><th>Клиент</th><th>Телефон</th><th>Окончание аренды</th><th>Действие</th></tr>`;
+            for (const item of data.equipment) {
+              if (item.Состояние === 'Свободен') {
+                html += `<tr><td>${item.Маркировка}</td><td>${item.Тип}</td><td>${item.Состояние}</td><td colspan="3" style="text-align:center;">—</td><td><button onclick="showContractForm('${item.Маркировка}')">Создать договор</button></td></tr>`;
+              } else if (item.Состояние === 'В аренде') {
+                html += `<tr><td>${item.Маркировка}</td><td>${item.Тип}</td><td>${item.Состояние}</td><td>${item.Клиент || '—'}</td><td>${item.Телефон || '—'}</td><td>${item.Окончание || '—'}</td><td><button onclick="returnEquipment('${item.Маркировка}')">Вернуть</button></td></tr>`;
+              }
+            }
+            html += '</table>';
+            document.getElementById('app').innerHTML = html;
+          } else {
+            document.getElementById('app').innerHTML = '<h1>Ошибка загрузки</h1>';
+          }
+        });
+    }
+
+    function showContractForm(marking) {
+      // временно — без формы, просто вернёмся
+      showEquipment();
+    }
+
+    function returnEquipment(marking) {
+      alert('Возврат пока не реализован в этом демо');
+      showEquipment();
+    }
+  </script>
 </body>
 </html>
-
