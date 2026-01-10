@@ -198,11 +198,57 @@ async function handleLogin(e) {
   const loginValue = document.getElementById('login').value;
   const passwordValue = document.getElementById('password').value;
   
-  showLoading('Выполняется вход...');
+  showLoading('Проверка логина и пароля...');
 
   try {
-    await login(loginValue, passwordValue);
-    showEquipment();
+    // Шаг 1: проверка логина/пароля
+    const loginRes = await fetch(`${BACKEND_URL}?action=login&login=${encodeURIComponent(loginValue)}&password=${encodeURIComponent(passwordValue)}`);
+    const loginData = await loginRes.json();
+    
+    if (!loginData.success) throw new Error(loginData.error);
+
+    // Шаг 2: запрос 2FA-кода
+    showLoading('Отправка кода в Telegram...');
+    const reqRes = await fetch(`${BACKEND_URL}?action=request2FA&login=${encodeURIComponent(loginValue)}`);
+    const reqData = await reqRes.json();
+    
+    if (!reqData.success) throw new Error(reqData.error);
+
+    // Шаг 3: форма ввода кода
+    document.getElementById('app').innerHTML = `
+      <h1>🔐 Двухфакторная аутентификация</h1>
+      <p>Введите 6-значный код из Telegram:</p>
+      <form id="2faForm" style="margin-top:20px;">
+        <input type="text" id="2faCode" maxlength="6" required 
+               style="font-size:20px; padding:10px; text-align:center; width:120px;">
+        <br><br>
+        <button type="submit">Подтвердить</button>
+        <button type="button" onclick="showLoginForm()">Отмена</button>
+      </form>
+    `;
+    
+    document.getElementById('2faForm').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const code = document.getElementById('2faCode').value;
+      if (code.length !== 6 || isNaN(code)) {
+        alert('Код должен содержать 6 цифр');
+        return;
+      }
+      
+      showLoading('Проверка кода...');
+      const vRes = await fetch(`${BACKEND_URL}?action=verify2FA&login=${encodeURIComponent(loginValue)}&code=${encodeURIComponent(code)}`);
+      const vData = await vRes.json();
+      
+      if (vData.success) {
+        // Сохраняем сессию
+        window.currentUser = loginData.user;
+        showEquipment();
+      } else {
+        alert('Ошибка: ' + vData.error);
+        showLoginForm();
+      }
+    });
+    
   } catch (err) {
     alert('Ошибка: ' + err.message);
     showLoginForm();
