@@ -5,89 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Аренда оборудования</title>
   <link rel="stylesheet" href="css/style.css" />
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div id="app">
     <h1>Вход в систему аренды оборудования</h1>
-    <!-- Кнопка Google появится здесь -->
+    <form id="loginForm">
+      <label>Логин:<br><input type="text" id="login" required></label><br><br>
+      <label>Пароль:<br><input type="password" id="password" required></label><br><br>
+      <button type="submit">Войти</button>
+    </form>
   </div>
-
-  <!-- Сначала подключаем config.js -->
   <script src="js/config.js"></script>
-
-  <!-- Потом — основной скрипт -->
-  <script>
-    // Как только страница загрузится
-    window.addEventListener('load', () => {
-      // Создаём конфигурацию Google Identity
-      window.google.accounts.id.initialize({
-        client_id: "425590971684-tlv3dk14b1ou5najmo6l5uacvfeksa9l.apps.googleusercontent.com",
-        callback: handleCredentialResponse
-      });
-
-      // Рендерим кнопку
-      window.google.accounts.id.renderButton(
-        document.getElementById("app"),
-        { theme: "outline", size: "large" }
-      );
-    });
-
-    function handleCredentialResponse(response) {
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      sessionStorage.setItem('googleEmail', payload.email);
-      showLoginForm();
-    }
-
-    function showLoginForm() {
-      document.getElementById('app').innerHTML = `
-        <h1>Вход в систему аренды оборудования</h1>
-        <form id="loginForm">
-          <label>Логин:<br><input type="text" id="login" required autocomplete="username"></label><br><br>
-          <label>Пароль:<br><input type="password" id="password" required autocomplete="current-password"></label><br><br>
-          <button type="submit">Войти</button>
-        </form>
-      `;
-      document.getElementById('loginForm').addEventListener('submit', handleLoginSubmit);
-    }
-
-    async function handleLoginSubmit(e) {
-      e.preventDefault();
-      const loginValue = document.getElementById('login').value;
-      const passwordValue = document.getElementById('password').value;
-      const email = sessionStorage.getItem('googleEmail');
-
-      if (!email) {
-        alert('Сначала войдите через Google');
-        return;
-      }
-
-      document.getElementById('app').innerHTML = '<h2>Выполняется вход...</h2>';
-
-      try {
-        const url = `${BACKEND_URL}?action=login&login=${encodeURIComponent(loginValue)}&password=${encodeURIComponent(passwordValue)}&email=${encodeURIComponent(email)}`;
-        const res = await fetch(url);
-        const result = await res.json();
-
-        if (result.success) {
-          sessionStorage.setItem('currentUser', JSON.stringify(result.user));
-          // Здесь можно перейти к app.js, но пока просто покажем успех
-          document.getElementById('app').innerHTML = '<h2>✅ Успешный вход!</h2>';
-          setTimeout(() => {
-            // Позже заменим на showEquipment()
-            location.reload(); // временно
-          }, 1500);
-        } else {
-          alert('Ошибка: ' + result.error);
-          showLoginForm();
-        }
-      } catch (err) {
-        alert('Сетевая ошибка: ' + err.message);
-        showLoginForm();
-      }
-    }
-  </script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
-
